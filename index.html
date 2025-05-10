@@ -1,0 +1,269 @@
+
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, ini al-scale=1.0"> 
+  < tle>Senment Analysis - Product Comments</ tle> 
+  <link rel="stylesheet" href="/sta c/styles.css"> 
+  <style> 
+    /* Styles for charts */ 
+    #charts-container { 
+      display: flex; 
+      flex-wrap: wrap; 
+      justify-content: space-around; 
+      margin-top: 20px; 
+    } 
+    #charts-container > div { 
+      flex: 1 1 300px; 
+      margin: 10px; 
+      text-align: center; 
+    } 
+    #charts-container img { 
+      max-width: 100%; 
+      height: auto; 
+    } 
+    /* Styles for addi onal reason sec on */ 
+    #more-reasons-section { 
+      margin-top: 20px; 
+    } 
+    #reason-input-box { 
+      margin-top: 10px; 
+    } 
+    #reason-input-box textarea { 
+      width: 80%; 
+      font-size: 16px; 
+      padding: 10px; 
+    } 
+    /* Product naviga on styling */ 
+    #product-nav { 
+      display: flex; 
+      justify-content: center; 
+      margin-top: 10px; 
+    } 
+    #product-nav button { 
+      background-color: #4CAF50; 
+      color: white; 
+      font-size: 18px; 
+      padding: 5px 10px; 
+      margin: 0 10px; 
+      border: none; 
+      cursor: pointer; 
+    } 
+    #product-nav bu on:hover { 
+      background-color: #45a049; 
+    } 
+    /* Result Cards Styling */ 
+    .result-card { 
+      background-color: #fff; 
+      border: 1px solid #ccc; 
+      border-radius: 15px; 
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+      padding: 15px; 
+      margin: 20px auto; 
+      width: 80%; 
+      text-align: center; 
+    } 
+    .result-label { 
+      font-size: 24px; 
+      font-weight: bold; 
+    } 
+    .result-value { 
+      font-size: 20px; 
+      margin-top: 10px; 
+    } 
+  </style> 
+</head> 
+<body> 
+  <header> 
+    <h1>Senment Reasoning system</h1> 
+  </header> 
+   
+  <main> 
+    <!-- Product Info & Naviga on --> 
+    <sec on id="product-info"> 
+      <img id="product-image" src="/sta c/analog_watch.jpg" alt="Product" width="300" 
+height="300"> 
+      <bu on id="prev-btn" class="nav-btn">&lt;</bu on> 
+      <bu on id="next-btn" class="nav-btn">&gt;</bu on> 
+    </sec on> 
+     
+    <!-- Analysis Form --> 
+    <sec on id="analysis-form"> 
+      <div class="review-container"> 
+          <label id="review-label" for="comments">Enter the Review:</label> 
+          <textarea id="comments" rows="5" cols="110" placeholder="Write your review 
+here..."></textarea> 
+      </div> 
+      <br><br> 
+      <bu on onclick="analyzeSenment()">Analyze Review</bu on> 
+    </sec on> 
+     
+    <!-- Addi onal Reason Input --> 
+    <sec on id="more-reasons-sec on"> 
+      <bu on id="more-reasons-bu on" onclick="toggleReasonInput()">Give More 
+Reasons</bu on> 
+      <div id="reason-input-box" style="display:none;"> 
+        <textarea id="addi onal-reason" rows="3" cols="50" placeholder="Enter addi onal 
+reason here..."></textarea><br> 
+        <bu on onclick="submitAdditionalReason()">Submit Addi onal Reason</bu on> 
+      </div> 
+    </sec on> 
+ 
+    <!-- Result Display --> 
+    <section id="result"> 
+      <!-- Senment Cards --> 
+      <div id="senment-tle-card" class="result-card"> 
+        <div class="result-label">Senment</div> 
+      </div> 
+      <div id="senment-value-card" class="result-card"> 
+        <div id="senment" class="result-value"></div> 
+      </div> 
+     
+      <!-- Reason Cards --> 
+      <div id="reason-tle-card" class="result-card"> 
+        <div class="result-label">Reason</div> 
+      </div> 
+      <div id="reason-value-card" class="result-card"> 
+        <div id="reason" class="result-value"></div> 
+      </div> 
+    </section> 
+     
+    <!-- Charts Section --> 
+    <section id="chart" style="display: none;"> 
+      <h3>Senment Analysis Overview</h3> 
+      <div id="charts-container"> 
+         <div id="bar-chart"> 
+           <h4>Bar Chart</h4> 
+           <img id="bar-chart-img" src="" alt="Senment Bar Chart"> 
+         </div> 
+         <div id="pie-chart"> 
+           <h4>Pie Chart</h4> 
+           <img id="pie-chart-img" src="" alt="Senment Pie Chart"> 
+         </div> 
+      </div> 
+    </sec on> 
+  </main> 
+ 
+  <script> 
+    // Array of product images for naviga on 
+    const productImages = [ 
+      '/sta c/analog_watch.jpg', 
+      '/sta c/smartphone.jpg', 
+      '/sta c/laptop.jpg', 
+      '/sta c/smart_tv.jpg', 
+      '/sta c/headphone.jpg' 
+    ]; 
+    let currentImageIndex = 0; 
+    let isEmphasized = false; 
+ 
+    function updateProductImage() { 
+      const productImageElem = document.getElementById('product-image'); 
+      productImageElem.src = productImages[currentImageIndex]; 
+ 
+      // Clear input and result fields 
+      document.getElementById('comments').value = ''; 
+      document.getElementById('senment').textContent = ''; 
+      document.getElementById('reason').textContent = ''; 
+      document.getElementById('chart').style.display = 'none'; 
+      document.getElementById('bar-chart-img').src = ""; 
+      document.getElementById('pie-chart-img').src = ""; 
+       
+      // Toggle emphasis effect 
+      isEmphasized = !isEmphasized; 
+      if (isEmphasized) { 
+        productImageElem.classList.add('emphasized'); 
+      } else { 
+        productImageElem.classList.remove('emphasized'); 
+      } 
+    } 
+ 
+    // Navigation button event listeners 
+    document.getElementById('prev-btn').addEventListener('click', function() { 
+      currentImageIndex = (currentImageIndex - 1 + productImages.length) % productImages.length; 
+      updateProductImage(); 
+    }); 
+    document.getElementById('next-btn').addEventListener('click', function() { 
+      currentImageIndex = (currentImageIndex + 1) % productImages.length; 
+      updateProductImage(); 
+    }); 
+ 
+    // Function to call backend analysis 
+    function analyzeSenment() { 
+      const commentsText = document.getElementById('comments').value; 
+      const comments = commentsText.split('\n') 
+                                   .map(comment => comment.trim()) 
+                                   .filter(comment => comment.length > 0); 
+      if (comments.length === 0) { 
+        alert("Please enter at least one review."); 
+        return; 
+      } 
+ 
+      // Clear previous results 
+      document.getElementById('senment').textContent = ""; 
+      document.getElementById('reason').textContent = ""; 
+      document.getElementById('chart').style.display = 'none'; 
+      document.getElementById('bar-chart-img').src = ""; 
+      document.getElementById('pie-chart-img').src = ""; 
+ 
+      fetch('/analyze', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'applica on/json' }, 
+        body: JSON.stringify({ comments }) 
+      }) 
+      .then(response => response.json()) 
+      .then(data => { 
+        console.log(data);  // Debug: inspect the returned data 
+ 
+        // Update senment card 
+        const senment = data.overall_senment; 
+        const emoji = senment === 'Posi ve' ? ' ' : senment === 'Nega ve' ? ' ' : ' '; 
+        document.getElementById('senment').textContent = `Overall senment of user is ${senment} ${emoji}`; 
+         
+        // Update reason card with a fallback if no reason is extracted 
+        const reasonText = data.reason  
+          ? `Reason behind the ${senment.toLowerCase()} senment is: ${data.reason}` 
+          : "No clear reason extracted."; 
+        document.getElementById('reason').textContent = reasonText; 
+         
+        // Update charts if available 
+        if (data.bar_chart_img) { 
+          document.getElementById('bar-chart-img').src = 'data:image/png;base64,' + 
+data.bar_chart_img; 
+        } 
+        if (data.pie_chart_img) { 
+          document.getElementById('pie-chart-img').src = 'data:image/png;base64,' + 
+data.pie_chart_img; 
+        } 
+        document.getElementById('chart').style.display = 'block'; 
+      }) 
+      .catch(error => { 
+        alert('Error analyzing review.'); 
+        console.error(error); 
+      }); 
+    } 
+ 
+    // Toggle the addi onal reason input box 
+    function toggleReasonInput() { 
+      const reasonInputBox = document.getElementById('reason-input-box'); 
+      reasonInputBox.style.display = (reasonInputBox.style.display === 'none' || 
+reasonInputBox.style.display === '')  
+                                     ? 'block'  
+                                     : 'none'; 
+    } 
+ 
+    // Process submission of addi onal reason 
+    function submitAdditionalReason() { 
+      const additionalReason = document.getElementById('additional-reason').value.trim(); 
+      if (!additionalReason) { 
+        alert("Please enter a reason."); 
+        return; 
+      } 
+      const reasonElement = document.getElementById('reason'); 
+      reasonElem.textContent += " | Addi onal Reason: " + additionalReason; 
+document.getElementById('reason-input-box').style.display = 'none'; 
+document.getElementById('additional-reason').value = ""; 
+} 
+</script> 
+</body> 
+</html>
